@@ -1,0 +1,25 @@
+appId: br.com.codecrafters.geopop
+---
+- runFlow: "00_setup.yaml"
+- tapOn: "Relatórios"
+- extendedWaitUntil:
+    visible:
+      id: "events-screen"
+    timeout: 15000
+- assertVisible: "Eventos"
+- assertVisible:
+    id: "event-filter-todos-eventos"
+- tapOn:
+    id: "event-filter-igni-o-ligada"
+- tapOn:
+    id: "event-filter-velocidade-excedida"
+- tapOn:
+    id: "event-filter-todos-eventos"
+- swipe:
+    direction: UP
+- tapOn: "Percursos"
+- assertVisible:
+    id: "routes-screen"
+- tapOn: "Eventos"
+- assertVisible:
+    id: "events-screen"

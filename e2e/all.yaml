@@ -1,0 +1,13 @@
+# Master runner — executa todos os flows em sequência
+# Uso: maestro test e2e/all.yaml
+appId: br.com.codecrafters.geopop
+---
+- runFlow: "flows/01_login.yaml"
+- runFlow: "flows/02_mapa.yaml"
+- runFlow: "flows/03_veiculos.yaml"
+- runFlow: "flows/04_relatorios_eventos.yaml"
+- runFlow: "flows/05_relatorios_percursos.yaml"
+- runFlow: "flows/06_cercas_virtuais.yaml"
+- runFlow: "flows/07_limite_velocidade.yaml"
+- runFlow: "flows/08_alertas.yaml"
+- runFlow: "flows/09_conta.yaml"

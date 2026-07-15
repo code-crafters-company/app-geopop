@@ -1,0 +1,59 @@
+appId: br.com.codecrafters.geopop
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible: "Entrar"
+    timeout: 20000
+- assertVisible:
+    id: "email-input"
+- assertVisible:
+    id: "senha-input"
+
+# Campos obrigatorios
+- tapOn:
+    id: "login-button"
+- assertVisible: "E-mail obrigatório"
+- assertVisible: "Senha obrigatória"
+
+# Credenciais invalidas
+- tapOn:
+    id: "email-input"
+- inputText: ${GEOPOP_EMAIL}
+- tapOn:
+    id: "senha-input"
+- inputText: "senha_invalida_e2e"
+- hideKeyboard
+- tapOn:
+    id: "login-button"
+- extendedWaitUntil:
+    visible: "Erro"
+    timeout: 15000
+- tapOn: "OK"
+
+# Login valido
+- tapOn:
+    id: "senha-input"
+- eraseText: 64
+- inputText: ${GEOPOP_SENHA}
+- hideKeyboard
+- tapOn:
+    id: "login-button"
+- extendedWaitUntil:
+    visible:
+      id: "map-screen"
+    timeout: 30000
+- assertVisible: "Meus veículos"
+
+# Logout confirma retorno ao login
+- tapOn: "Configuração"
+- tapOn: "Conta"
+- assertVisible:
+    id: "account-screen"
+- tapOn:
+    id: "signout-btn"
+- tapOn: "Sair"
+- extendedWaitUntil:
+    visible:
+      id: "login-button"
+    timeout: 10000

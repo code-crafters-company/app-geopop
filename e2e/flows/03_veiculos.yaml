@@ -1,0 +1,29 @@
+appId: br.com.codecrafters.geopop
+---
+- runFlow: "00_setup.yaml"
+- assertVisible:
+    id: "vehicle-panel"
+- tapOn:
+    id: "vehicle-search"
+- inputText: ${GEOPOP_PLACA}
+- hideKeyboard
+
+# A placa provisionada deve pertencer ao favorecido com o mesmo CPF/CNPJ do UsuarioApp.
+- extendedWaitUntil:
+    visible: ${GEOPOP_PLACA}
+    timeout: 30000
+- assertVisible: ${GEOPOP_PLACA}
+- tapOn:
+    id: "vehicle-row-.*"
+    index: 0
+- assertVisible:
+    id: "selected-vehicle-card"
+- tapOn:
+    id: "selected-vehicle-card"
+- assertVisible: "Velocidade"
+- assertVisible: "Ignição"
+- assertVisible: "Bateria"
+- assertVisible: "Localização"
+- back
+- assertVisible:
+    id: "map-screen"

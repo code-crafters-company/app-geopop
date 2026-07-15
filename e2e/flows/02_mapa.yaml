@@ -1,0 +1,32 @@
+appId: br.com.codecrafters.geopop
+---
+- runFlow: "00_setup.yaml"
+- assertVisible:
+    id: "map-screen"
+- assertVisible:
+    id: "vehicle-panel"
+- assertVisible: "Meus veículos"
+- assertVisible:
+    id: "vehicle-search"
+
+# Busca e filtros iguais ao portal
+- tapOn:
+    id: "vehicle-search"
+- inputText: "TESTE"
+- eraseText: 5
+- hideKeyboard
+- tapOn:
+    id: "vehicle-filter-on"
+- tapOn:
+    id: "vehicle-filter-off"
+- tapOn:
+    id: "vehicle-filter-all"
+
+# Abre notificacoes pelo sino do cabecalho e retorna
+- tapOn:
+    id: "notifications-button"
+- assertVisible:
+    id: "notifications-screen"
+- back
+- assertVisible:
+    id: "map-screen"

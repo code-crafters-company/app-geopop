@@ -1,0 +1,29 @@
+appId: br.com.codecrafters.geopop
+---
+- runFlow: "00_setup.yaml"
+- tapOn: "Configuração"
+- tapOn: "Velocidade"
+- assertVisible: "Limite de Velocidade"
+- extendedWaitUntil:
+    visible:
+      id: "edit-velocidade-.*"
+    timeout: 30000
+- tapOn:
+    id: "edit-velocidade-.*"
+    index: 0
+- assertVisible:
+    id: "speed-limit-input"
+
+# Valida o formulario sem alterar configuracao persistida.
+- tapOn:
+    id: "speed-limit-input"
+- eraseText: 8
+- inputText: "999"
+- hideKeyboard
+- tapOn:
+    id: "save-velocidade-btn"
+- assertVisible: "Valor inválido"
+- tapOn: "OK"
+- tapOn:
+    id: "cancel-velocidade-btn"
+- assertVisible: "Configure o alerta por veículo"

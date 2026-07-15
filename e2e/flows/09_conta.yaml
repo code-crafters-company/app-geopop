@@ -1,0 +1,25 @@
+appId: br.com.codecrafters.geopop
+---
+- runFlow: "00_setup.yaml"
+- tapOn: "Configuração"
+- tapOn: "Conta"
+- assertVisible:
+    id: "account-screen"
+- assertVisible: "Nome"
+- assertVisible: "Tenant"
+- assertVisible: "Sair da Conta"
+
+# Cancela e confirma logout.
+- tapOn:
+    id: "signout-btn"
+- assertVisible: "Deseja sair da conta?"
+- tapOn: "Cancelar"
+- assertVisible:
+    id: "account-screen"
+- tapOn:
+    id: "signout-btn"
+- tapOn: "Sair"
+- extendedWaitUntil:
+    visible:
+      id: "login-button"
+    timeout: 10000

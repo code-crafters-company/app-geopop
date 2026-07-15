@@ -1,0 +1,36 @@
+appId: br.com.codecrafters.geopop
+---
+- runFlow: "00_setup.yaml"
+- tapOn: "Relatórios"
+- tapOn: "Percursos"
+- assertVisible:
+    id: "routes-screen"
+- assertVisible: "Selecione um veículo"
+- extendedWaitUntil:
+    visible:
+      id: "route-vehicle-.*"
+    timeout: 30000
+- tapOn:
+    id: "route-vehicle-.*"
+    index: 0
+- tapOn:
+    id: "route-period-7"
+- tapOn:
+    id: "route-period-30"
+- tapOn:
+    id: "route-period-1"
+
+# Aceita historico vazio; quando houver pontos, valida mapa e estatisticas.
+- runFlow:
+    when:
+      visible:
+        id: "route-stats"
+    commands:
+      - assertVisible:
+          id: "route-map"
+      - assertVisible: "Vel. Máxima"
+- runFlow:
+    when:
+      visible: "Sem percurso"
+    commands:
+      - assertVisible: "Nenhuma posição registrada"

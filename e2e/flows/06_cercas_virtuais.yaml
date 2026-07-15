@@ -1,0 +1,37 @@
+appId: br.com.codecrafters.geopop
+---
+- runFlow: "00_setup.yaml"
+- tapOn: "Configuração"
+- assertVisible: "Cercas Virtuais"
+- evalScript: ${output.cercaNome = 'CercaE2E' + Date.now()}
+- tapOn:
+    id: "add-cerca-btn"
+- assertVisible: "Nova Cerca Virtual"
+- tapOn:
+    id: "geofence-name"
+- inputText: ${output.cercaNome}
+- tapOn:
+    id: "geofence-vehicle-.*"
+    index: 0
+- tapOn:
+    id: "geofence-map"
+- tapOn:
+    id: "geofence-radius"
+- eraseText: 8
+- inputText: "300"
+- hideKeyboard
+- tapOn:
+    id: "submit-cerca-btn"
+- extendedWaitUntil:
+    visible:
+      id: "geofence-card-${output.cercaNome}"
+    timeout: 20000
+
+# Remove exatamente a cerca criada pelo teste.
+- tapOn:
+    id: "delete-geofence-${output.cercaNome}"
+- tapOn: "Deletar"
+- extendedWaitUntil:
+    notVisible:
+      id: "geofence-card-${output.cercaNome}"
+    timeout: 15000

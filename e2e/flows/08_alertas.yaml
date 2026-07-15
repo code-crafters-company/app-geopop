@@ -1,0 +1,27 @@
+appId: br.com.codecrafters.geopop
+---
+- runFlow: "00_setup.yaml"
+- tapOn: "Alertas"
+- assertVisible:
+    id: "notifications-screen"
+- assertVisible: "Alertas"
+
+- runFlow:
+    when:
+      visible:
+        id: "mark-all-btn"
+    commands:
+      - tapOn:
+          id: "mark-all-btn"
+- runFlow:
+    when:
+      visible:
+        id: "notification-.*"
+    commands:
+      - tapOn:
+          id: "notification-.*"
+          index: 0
+- swipe:
+    direction: DOWN
+- assertVisible:
+    id: "notifications-screen"

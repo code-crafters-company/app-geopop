@@ -1,0 +1,21 @@
+appId: br.com.codecrafters.geopop
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible:
+      id: "email-input"
+    timeout: 20000
+- tapOn:
+    id: "email-input"
+- inputText: ${GEOPOP_EMAIL}
+- tapOn:
+    id: "senha-input"
+- inputText: ${GEOPOP_SENHA}
+- hideKeyboard
+- tapOn:
+    id: "login-button"
+- extendedWaitUntil:
+    visible:
+      id: "map-screen"
+    timeout: 30000
