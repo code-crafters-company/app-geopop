@@ -1,5 +1,6 @@
 appId: br.com.codecrafters.geopop
 ---
+- clearKeychain
 - launchApp:
     clearState: true
 - extendedWaitUntil:
@@ -12,7 +13,8 @@ appId: br.com.codecrafters.geopop
 - tapOn:
     id: "senha-input"
 - inputText: ${GEOPOP_SENHA}
-- hideKeyboard
+# Dispensa o teclado tocando num texto estatico (hideKeyboard falha em inputs seguros no iOS)
+- tapOn: "Acesse sua conta"
 - tapOn:
     id: "login-button"
 - extendedWaitUntil:

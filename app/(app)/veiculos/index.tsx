@@ -22,7 +22,7 @@ export default function VeiculosScreen() {
   const items = data?.result ?? [];
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View testID="vehicles-screen" style={[styles.container, { paddingTop: insets.top }]}>
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>Veículos</Text>
@@ -52,6 +52,7 @@ export default function VeiculosScreen() {
           keyExtractor={(v) => v.id}
           renderItem={({ item }) => (
             <VeiculoCard
+              testID={`vehicle-card-${item.id}`}
               veiculo={item}
               onPress={() => router.push(`/(app)/veiculos/${item.id}`)}
             />

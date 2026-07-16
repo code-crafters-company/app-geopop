@@ -1,9 +1,11 @@
 appId: br.com.codecrafters.geopop
 ---
+- clearKeychain
 - launchApp:
     clearState: true
 - extendedWaitUntil:
-    visible: "Entrar"
+    visible:
+      id: "login-button"
     timeout: 20000
 - assertVisible:
     id: "email-input"
@@ -23,7 +25,7 @@ appId: br.com.codecrafters.geopop
 - tapOn:
     id: "senha-input"
 - inputText: "senha_invalida_e2e"
-- hideKeyboard
+- tapOn: "Acesse sua conta"
 - tapOn:
     id: "login-button"
 - extendedWaitUntil:
@@ -36,7 +38,7 @@ appId: br.com.codecrafters.geopop
     id: "senha-input"
 - eraseText: 64
 - inputText: ${GEOPOP_SENHA}
-- hideKeyboard
+- tapOn: "Acesse sua conta"
 - tapOn:
     id: "login-button"
 - extendedWaitUntil:
@@ -46,13 +48,21 @@ appId: br.com.codecrafters.geopop
 - assertVisible: "Meus veículos"
 
 # Logout confirma retorno ao login
-- tapOn: "Configuração"
+- tapOn:
+    id: "tab-configuracao"
+- extendedWaitUntil:
+    visible: "Conta"
+    timeout: 10000
 - tapOn: "Conta"
 - assertVisible:
     id: "account-screen"
+- scrollUntilVisible:
+    element:
+      id: "signout-btn"
+    direction: DOWN
 - tapOn:
     id: "signout-btn"
-- tapOn: "Sair"
+- tapOn: "^Sair$"
 - extendedWaitUntil:
     visible:
       id: "login-button"

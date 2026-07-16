@@ -1,12 +1,51 @@
 appId: br.com.codecrafters.geopop
 ---
 - runFlow: "00_setup.yaml"
-- tapOn: "Configuração"
+- tapOn:
+    id: "tab-configuracao"
+- extendedWaitUntil:
+    visible: "Conta"
+    timeout: 10000
 - tapOn: "Conta"
 - assertVisible:
     id: "account-screen"
 - assertVisible: "Nome"
+- assertVisible: "Função"
 - assertVisible: "Tenant"
+
+# Status de conexao em tempo real
+- assertVisible:
+    id: "realtime-connection-card"
+
+# Alterar senha: valida sem preencher (evita teclado sobre campos seguros no iOS)
+- scrollUntilVisible:
+    element:
+      id: "alterar-senha-btn"
+    direction: DOWN
+- assertVisible:
+    id: "nova-senha-input"
+- assertVisible:
+    id: "confirmar-senha-input"
+- tapOn:
+    id: "alterar-senha-btn"
+- assertVisible: "A senha deve ter pelo menos 6 caracteres"
+
+# Preferencias de notificacao (toggles)
+- assertVisible:
+    id: "notif-pref-ignicaoLigada"
+- scrollUntilVisible:
+    element:
+      id: "notif-pref-excessoVelocidade"
+    direction: DOWN
+- tapOn:
+    id: "notif-pref-excessoVelocidade"
+- tapOn:
+    id: "notif-pref-excessoVelocidade"
+
+- scrollUntilVisible:
+    element:
+      text: "Sair da Conta"
+    direction: DOWN
 - assertVisible: "Sair da Conta"
 
 # Cancela e confirma logout.
@@ -18,7 +57,7 @@ appId: br.com.codecrafters.geopop
     id: "account-screen"
 - tapOn:
     id: "signout-btn"
-- tapOn: "Sair"
+- tapOn: "^Sair$"
 - extendedWaitUntil:
     visible:
       id: "login-button"

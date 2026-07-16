@@ -1,7 +1,7 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'https://api.geopop.com.br/api/v1';
+const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'https://api.geopop.com.br/api/v1/';
 const DEFAULT_TENANT = process.env.EXPO_PUBLIC_DEFAULT_TENANT ?? 'default';
 
 export const TOKEN_KEY = 'geopop_token';

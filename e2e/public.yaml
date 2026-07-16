@@ -1,0 +1,4 @@
+# Fluxos que não exigem credenciais nem criam dados na API.
+appId: br.com.codecrafters.geopop
+---
+- runFlow: "flows/10_cadastro.yaml"

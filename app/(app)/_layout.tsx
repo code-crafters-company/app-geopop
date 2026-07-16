@@ -27,6 +27,7 @@ export default function AppLayout() {
         name="index"
         options={{
           title: 'Mapa',
+          tabBarButtonTestID: 'tab-mapa',
           tabBarIcon: ({ color, size }) => <MapPin size={size} color={color} weight="fill" />,
         }}
       />
@@ -40,6 +41,7 @@ export default function AppLayout() {
         name="relatorios"
         options={{
           title: 'Relatórios',
+          tabBarButtonTestID: 'tab-relatorios',
           tabBarIcon: ({ color, size }) => <ChartLine size={size} color={color} weight="fill" />,
         }}
       />
@@ -47,6 +49,7 @@ export default function AppLayout() {
         name="configuracao"
         options={{
           title: 'Configuração',
+          tabBarButtonTestID: 'tab-configuracao',
           tabBarIcon: ({ color, size }) => <Gear size={size} color={color} weight="fill" />,
         }}
       />
@@ -54,6 +57,7 @@ export default function AppLayout() {
         name="notificacoes"
         options={{
           title: 'Alertas',
+          tabBarButtonTestID: 'tab-alertas',
           tabBarIcon: ({ color, size }) => <Bell size={size} color={color} weight="fill" />,
         }}
       />

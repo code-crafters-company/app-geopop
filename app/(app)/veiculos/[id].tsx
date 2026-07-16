@@ -48,10 +48,10 @@ export default function VeiculoDetailScreen() {
   const online = isVeiculoOnline(veiculo);
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View testID="vehicle-detail-screen" style={[styles.container, { paddingTop: insets.top }]}>
       {/* Header */}
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()} style={styles.backBtn}>
+        <Pressable testID="vehicle-detail-back" onPress={() => router.back()} style={styles.backBtn}>
           <ArrowLeft size={22} color={colors.text} />
         </Pressable>
         <Text style={styles.headerTitle}>{veiculo.placa}</Text>

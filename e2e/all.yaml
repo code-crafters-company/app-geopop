@@ -2,6 +2,7 @@
 # Uso: maestro test e2e/all.yaml
 appId: br.com.codecrafters.geopop
 ---
+- runFlow: "flows/10_cadastro.yaml"
 - runFlow: "flows/01_login.yaml"
 - runFlow: "flows/02_mapa.yaml"
 - runFlow: "flows/03_veiculos.yaml"
@@ -11,3 +12,4 @@ appId: br.com.codecrafters.geopop
 - runFlow: "flows/07_limite_velocidade.yaml"
 - runFlow: "flows/08_alertas.yaml"
 - runFlow: "flows/09_conta.yaml"
+- runFlow: "flows/11_lista_veiculos.yaml"

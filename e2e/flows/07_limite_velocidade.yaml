@@ -1,7 +1,8 @@
 appId: br.com.codecrafters.geopop
 ---
 - runFlow: "00_setup.yaml"
-- tapOn: "Configuração"
+- tapOn:
+    id: "tab-configuracao"
 - tapOn: "Velocidade"
 - assertVisible: "Limite de Velocidade"
 - extendedWaitUntil:

@@ -1,0 +1,79 @@
+appId: br.com.codecrafters.geopop
+---
+- clearKeychain
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible:
+      id: "login-button"
+    timeout: 20000
+- tapOn:
+    id: "login-button"
+- assertVisible: "E-mail obrigatório"
+- assertVisible: "Senha obrigatória"
+- tapOn:
+    id: "open-cadastro-btn"
+- assertVisible:
+    id: "cadastro-screen"
+- assertVisible:
+    id: "cadastro-nome-input"
+- assertVisible:
+    id: "cadastro-documento-input"
+- assertVisible:
+    id: "cadastro-email-input"
+- assertVisible:
+    id: "cadastro-senha-input"
+- assertVisible:
+    id: "cadastro-confirmar-senha-input"
+- assertVisible:
+    id: "cadastro-termos-checkbox"
+- extendedWaitUntil:
+    visible:
+      id: "cadastro-button"
+    timeout: 15000
+
+# Abre a tela de Termos de Uso pelo link e retorna
+- scrollUntilVisible:
+    element:
+      id: "cadastro-termos-link"
+    direction: DOWN
+- tapOn:
+    id: "cadastro-termos-link"
+- assertVisible:
+    id: "termos-screen"
+- assertVisible: "1. Aceitação dos Termos"
+- tapOn:
+    id: "termos-back-btn"
+- assertVisible:
+    id: "cadastro-screen"
+
+- tapOn:
+    id: "cadastro-back-btn"
+- assertVisible:
+    id: "login-button"
+- tapOn:
+    id: "open-cadastro-btn"
+- assertVisible:
+    id: "cadastro-screen"
+
+# Validacoes locais, sem criar dados persistentes na API.
+- tapOn:
+    id: "cadastro-button"
+- assertVisible: "Informe seu nome completo"
+- assertVisible: "Informe um CPF ou CNPJ válido"
+- assertVisible: "Informe um e-mail válido"
+- assertVisible: "A senha deve ter pelo menos 6 caracteres"
+- assertVisible: "Confirme sua senha"
+- scrollUntilVisible:
+    element:
+      text: "É necessário aceitar os Termos de Uso"
+    direction: DOWN
+- assertVisible: "É necessário aceitar os Termos de Uso"
+- scrollUntilVisible:
+    element:
+      id: "cadastro-login-link"
+    direction: DOWN
+- tapOn:
+    id: "cadastro-login-link"
+- assertVisible:
+    id: "login-button"

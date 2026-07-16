@@ -1,0 +1,55 @@
+# Fluxo avulso (NAO faz parte da suite numerada) para criar um UsuarioApp real
+# via a tela de Cadastro e obter credenciais utilizaveis nos demais fluxos e2e.
+# Uso: maestro test e2e/setup-test-user.yaml --env-file e2e/.env
+appId: br.com.codecrafters.geopop
+---
+- clearKeychain
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible:
+      id: "email-input"
+    timeout: 20000
+- tapOn:
+    id: "open-cadastro-btn"
+- extendedWaitUntil:
+    visible:
+      id: "cadastro-screen"
+    timeout: 10000
+- tapOn:
+    id: "cadastro-nome-input"
+- inputText: ${GEOPOP_NOME}
+- tapOn:
+    id: "cadastro-documento-input"
+- inputText: ${GEOPOP_CPF}
+- tapOn:
+    id: "cadastro-email-input"
+- inputText: ${GEOPOP_EMAIL}
+# Dispensa o teclado tocando no titulo (visivel no topo). hideKeyboard falha
+# em inputs seguros no iOS, e tocar o campo com o teclado aberto cai sobre ele.
+- tapOn: "Nome completo"
+# Rola o botao de submit para a area visivel, trazendo os campos de senha para
+# cima da zona do teclado, permitindo focar cada um corretamente.
+- scrollUntilVisible:
+    element:
+      id: "cadastro-button"
+    direction: DOWN
+- tapOn:
+    id: "cadastro-senha-input"
+- inputText: ${GEOPOP_SENHA}
+# Dispensa o teclado antes de focar o proximo campo seguro (senao o teclado
+# cobre o Confirmar e o foco nao muda, concatenando tudo na Senha).
+- tapOn: "Nome completo"
+- tapOn:
+    id: "cadastro-confirmar-senha-input"
+- inputText: ${GEOPOP_SENHA}
+- tapOn: "Nome completo"
+# Aceita os Termos de Uso (obrigatorio para cadastrar)
+- tapOn:
+    id: "cadastro-termos-checkbox"
+- tapOn:
+    id: "cadastro-button"
+- extendedWaitUntil:
+    visible: "Ir para o login"
+    timeout: 15000
+- tapOn: "Ir para o login"

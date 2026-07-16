@@ -1,6 +1,6 @@
 # Testes E2E do GeoPop Mobile
 
-Suite Maestro para Android com login e os fluxos funcionais exigidos no aplicativo.
+Suite Maestro para iOS e Android com autenticação, cadastro e navegação funcional do aplicativo.
 
 ## Cobertura
 
@@ -15,19 +15,23 @@ Suite Maestro para Android com login e os fluxos funcionais exigidos no aplicati
 | `07_limite_velocidade.yaml` | Edicao e validacao sem alterar o limite persistido |
 | `08_alertas.yaml` | Lista, leitura e marcacao de todas as notificacoes |
 | `09_conta.yaml` | Dados da conta, cancelamento e confirmacao de logout |
+| `10_cadastro.yaml` | Login obrigatório, navegação e validações do cadastro sem persistir usuário |
+| `11_lista_veiculos.yaml` | Deep link, busca, lista dedicada e detalhe do veículo |
 
 Cada fluxo limpa o estado local e realiza um novo login. Eles podem ser executados isoladamente ou pela suite `all.yaml`.
 
 ## Pre-requisitos
 
 - Java 17 ou superior.
-- Android Studio com um emulador iniciado, ou aparelho visivel em `adb devices`.
+- Simulador iOS iniciado ou Android Studio com um dispositivo visível.
 - Maestro CLI instalado e disponivel no `PATH`.
-- Development Build ou APK do GeoPop instalado com o pacote `br.com.codecrafters.geopop`.
+- Development Build do GeoPop instalado com o bundle `br.com.codecrafters.geopop`.
 - Tenant de teste com pelo menos um veiculo.
 - API acessivel pelo dispositivo.
 
 O Expo Go nao possui o `appId` do GeoPop e nao deve ser usado para estes testes.
+
+No iOS, os fluxos limpam também o Keychain para garantir que cada login comece sem sessão anterior.
 
 ## Configuracao
 
@@ -79,8 +83,11 @@ adb devices
 
 ```powershell
 npm run e2e:validate
+npm run e2e:public
 npm run e2e
 ```
+
+`npm run e2e:public` valida login e cadastro sem credenciais. `npm run e2e` exige `e2e/.env` e percorre todas as telas.
 
 Fluxos individuais:
 
@@ -92,6 +99,8 @@ npm run e2e:relatorios
 npm run e2e:configuracao
 npm run e2e:alertas
 npm run e2e:conta
+npm run e2e:cadastro
+npm run e2e:lista-veiculos
 ```
 
 Relatorio JUnit:

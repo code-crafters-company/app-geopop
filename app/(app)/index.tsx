@@ -1,10 +1,10 @@
 import { HubConnectionBuilder, LogLevel, type HubConnection } from '@microsoft/signalr';
 import * as SecureStore from 'expo-secure-store';
 import { useRouter } from 'expo-router';
-import { BatteryMedium, Bell, CaretDown, CaretUp, Lightning, MagnifyingGlass, MapPin, WifiHigh, WifiSlash } from 'phosphor-react-native';
+import { BatteryMedium, Bell, CaretDown, CaretUp, Lightning, MagnifyingGlass, MapPin, MapTrifold, WifiHigh, WifiSlash } from 'phosphor-react-native';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { FlatList, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE, type MapType } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, radius, spacing } from '../../src/components/theme';
 import { useVeiculos } from '../../src/hooks/useVeiculos';
@@ -13,20 +13,25 @@ import { useTrackingStore } from '../../src/stores/tracking';
 import { getVeiculoLocalizacao, hasVeiculoGps, isVeiculoOnline, type Veiculo } from '../../src/types';
 import { formatDateTime, formatSpeed } from '../../src/utils/format';
 
-const API_BASE = (process.env.EXPO_PUBLIC_API_URL ?? 'https://api.geopop.com.br/api/v1').replace(/\/api\/v1\/?$/, '');
+const API_BASE = (process.env.EXPO_PUBLIC_API_URL ?? 'https://api.geopop.com.br/api/v1/').replace(/\/api\/v1\/?$/, '');
 type IgnitionFilter = 'all' | 'on' | 'off';
+const MAP_TYPE_LABELS: Record<MapType, string> = {
+  standard: 'Padrão', satellite: 'Satélite', hybrid: 'Híbrido', terrain: 'Terreno',
+  none: 'Nenhum', mutedStandard: 'Padrão', satelliteFlyover: 'Satélite', hybridFlyover: 'Híbrido',
+};
 
 export default function MapaScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const mapRef = useRef<MapView>(null);
   const { data, isLoading } = useVeiculos();
-  const { vehicles, setVehicles, updateVehicle } = useTrackingStore();
+  const { vehicles, setVehicles, updateVehicle, connected, setConnected } = useTrackingStore();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showList, setShowList] = useState(true);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<IgnitionFilter>('all');
-  const [connected, setConnected] = useState(false);
+  const [mapType, setMapType] = useState<MapType>('standard');
+  const [showMapTypeMenu, setShowMapTypeMenu] = useState(false);
 
   useEffect(() => {
     if (data?.result) setVehicles(data.result);
@@ -45,7 +50,7 @@ export default function MapaScreen() {
           headers: { 'X-Tenant-Subdomain': tenant },
         })
         .withAutomaticReconnect()
-        .configureLogging(LogLevel.Error)
+        .configureLogging(LogLevel.None)
         .build();
 
       connection.on('PosicaoAtualizada', (msg: {
@@ -113,6 +118,7 @@ export default function MapaScreen() {
         style={StyleSheet.absoluteFillObject}
         provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined}
         userInterfaceStyle="light"
+        mapType={mapType}
         initialRegion={{ latitude: -14.235, longitude: -51.925, latitudeDelta: 25, longitudeDelta: 25 }}
       >
         {list.filter(hasVeiculoGps).map((vehicle) => (
@@ -143,6 +149,29 @@ export default function MapaScreen() {
         <Text style={styles.summaryTitle}>{list.length} veículos</Text>
         <Text style={styles.summaryOnline}>{onlineCount} online</Text>
         <Text style={styles.summaryOffline}>{list.length - onlineCount} offline</Text>
+      </View>
+
+      <View style={[styles.mapTypeWrap, { top: insets.top + 76 }]}>
+        <Pressable testID="map-type-toggle" style={styles.mapTypeButton} onPress={() => setShowMapTypeMenu((value) => !value)}>
+          <MapTrifold size={16} color={colors.text} />
+          <Text style={styles.mapTypeLabel}>{MAP_TYPE_LABELS[mapType]}</Text>
+          {showMapTypeMenu ? <CaretUp size={14} color={colors.textSecondary} /> : <CaretDown size={14} color={colors.textSecondary} />}
+        </Pressable>
+        {showMapTypeMenu && (
+          <View style={styles.mapTypeMenu}>
+            {(['standard', 'satellite', 'hybrid'] as const).map((value) => (
+              <Pressable
+                key={value}
+                testID={`map-type-${value}`}
+                style={styles.mapTypeOption}
+                onPress={() => { setMapType(value); setShowMapTypeMenu(false); }}
+              >
+                <Text style={[styles.mapTypeOptionText, mapType === value && styles.mapTypeOptionTextActive]}>{MAP_TYPE_LABELS[value]}</Text>
+                {mapType === value && <View style={styles.mapTypeCheck} />}
+              </Pressable>
+            ))}
+          </View>
+        )}
       </View>
 
       {selected && !showList && <SelectedVehicle vehicle={selected} onOpen={() => router.push(`/(app)/veiculos/${selected.id}`)} bottom={insets.bottom + 76} />}
@@ -226,6 +255,22 @@ const styles = StyleSheet.create({
   summaryTitle: { color: colors.text, fontSize: 11, fontWeight: '700' },
   summaryOnline: { color: '#047857', fontSize: 11, fontWeight: '600' },
   summaryOffline: { color: colors.textMuted, fontSize: 11 },
+  mapTypeWrap: { position: 'absolute', right: spacing.md, alignItems: 'flex-end' },
+  mapTypeButton: {
+    flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#FFFFFFF2',
+    borderRadius: radius.full, paddingHorizontal: 12, paddingVertical: 7,
+    borderWidth: 1, borderColor: colors.cardBorder,
+  },
+  mapTypeLabel: { color: colors.text, fontSize: 11, fontWeight: '700' },
+  mapTypeMenu: {
+    marginTop: 6, backgroundColor: colors.surface, borderRadius: radius.md,
+    borderWidth: 1, borderColor: colors.cardBorder, overflow: 'hidden', minWidth: 120,
+    shadowColor: '#000', shadowOpacity: 0.12, shadowRadius: 8, elevation: 4,
+  },
+  mapTypeOption: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 14, paddingVertical: 10 },
+  mapTypeOptionText: { color: colors.textSecondary, fontSize: 13 },
+  mapTypeOptionTextActive: { color: colors.text, fontWeight: '700' },
+  mapTypeCheck: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.primary },
   marker: { paddingHorizontal: 7, paddingVertical: 4, borderRadius: 7, borderWidth: 2 },
   markerOn: { backgroundColor: '#ECFDF5', borderColor: colors.success },
   markerOff: { backgroundColor: '#FFFFFF', borderColor: colors.textMuted },

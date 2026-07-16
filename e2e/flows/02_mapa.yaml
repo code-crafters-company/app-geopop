@@ -14,7 +14,10 @@ appId: br.com.codecrafters.geopop
     id: "vehicle-search"
 - inputText: "TESTE"
 - eraseText: 5
-- hideKeyboard
+# Dispensa o teclado tocando na area do mapa (hideKeyboard instavel no iOS;
+# nao tocar no titulo do painel, que o colapsa)
+- tapOn:
+    point: "50%,32%"
 - tapOn:
     id: "vehicle-filter-on"
 - tapOn:
@@ -22,11 +25,28 @@ appId: br.com.codecrafters.geopop
 - tapOn:
     id: "vehicle-filter-all"
 
-# Abre notificacoes pelo sino do cabecalho e retorna
+# Alterna o tipo de mapa: Padrao / Satelite / Hibrido
+- tapOn:
+    id: "map-type-toggle"
+- assertVisible:
+    id: "map-type-satellite"
+- tapOn:
+    id: "map-type-satellite"
+- tapOn:
+    id: "map-type-toggle"
+- tapOn:
+    id: "map-type-hybrid"
+- tapOn:
+    id: "map-type-toggle"
+- tapOn:
+    id: "map-type-standard"
+
+# Abre notificacoes pelo sino do cabecalho e retorna pela aba Mapa
 - tapOn:
     id: "notifications-button"
 - assertVisible:
     id: "notifications-screen"
-- back
+- tapOn:
+    id: "tab-mapa"
 - assertVisible:
     id: "map-screen"

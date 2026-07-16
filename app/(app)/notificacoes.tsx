@@ -40,7 +40,7 @@ function NotificacaoItem({
 
   return (
     <Pressable
-      testID={`notification-${item.id}`}
+      testID={`${isUnread ? 'notification-unread' : 'notification'}-${item.id}`}
       style={[styles.item, isUnread && styles.itemUnread]}
       onPress={() => !item.lida && onRead(item.id)}
     >

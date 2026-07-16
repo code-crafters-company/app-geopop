@@ -11,6 +11,7 @@ export interface LoginResult {
   logoUrl?: string | null;
   subdominio?: string | null;
   isAppUser: boolean;
+  ultimoLogin?: string | null;
 }
 
 export interface Veiculo {

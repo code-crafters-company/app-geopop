@@ -9,6 +9,7 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "e2e:validate": "node scripts/validate-maestro.mjs",
+    "e2e:public": "maestro test e2e/public.yaml",
     "e2e": "maestro test e2e/all.yaml --env-file e2e/.env",
     "e2e:login": "maestro test e2e/flows/01_login.yaml --env-file e2e/.env",
     "e2e:mapa": "maestro test e2e/flows/02_mapa.yaml --env-file e2e/.env",
@@ -16,7 +17,9 @@
     "e2e:relatorios": "maestro test e2e/flows/04_relatorios_eventos.yaml e2e/flows/05_relatorios_percursos.yaml --env-file e2e/.env",
     "e2e:configuracao": "maestro test e2e/flows/06_cercas_virtuais.yaml e2e/flows/07_limite_velocidade.yaml --env-file e2e/.env",
     "e2e:alertas": "maestro test e2e/flows/08_alertas.yaml --env-file e2e/.env",
-    "e2e:conta": "maestro test e2e/flows/09_conta.yaml --env-file e2e/.env"
+    "e2e:conta": "maestro test e2e/flows/09_conta.yaml --env-file e2e/.env",
+    "e2e:cadastro": "maestro test e2e/flows/10_cadastro.yaml",
+    "e2e:lista-veiculos": "maestro test e2e/flows/11_lista_veiculos.yaml --env-file e2e/.env"
   },
   "dependencies": {
     "@expo/vector-icons": "~15.0.3",
@@ -26,7 +29,7 @@
     "@react-navigation/material-top-tabs": "^7.6.2",
     "@tanstack/react-query": "^5.90.20",
     "axios": "^1.13.4",
-    "expo": "~54.0.33",
+    "expo": "~54.0.36",
     "expo-constants": "~18.0.13",
     "expo-font": "~14.0.11",
     "expo-haptics": "~15.0.8",
@@ -48,8 +51,10 @@
     "react-native-reanimated": "~4.1.1",
     "react-native-safe-area-context": "5.6.2",
     "react-native-screens": "~4.16.0",
+    "react-native-svg": "15.12.1",
     "react-native-tab-view": "^4.3.1",
     "react-native-web": "~0.21.2",
+    "react-native-worklets": "0.5.1",
     "zod": "^4.3.6",
     "zustand": "^5.0.11"
   },

@@ -8,15 +8,17 @@ import { formatSpeed, formatDateTime } from '../utils/format';
 interface Props {
   veiculo: Veiculo;
   onPress?: () => void;
+  testID?: string;
 }
 
-export function VeiculoCard({ veiculo, onPress }: Props) {
+export function VeiculoCard({ veiculo, onPress, testID }: Props) {
   const ignicaoColor = veiculo.ignicao ? colors.ignitionOn : colors.ignitionOff;
   const online = isVeiculoOnline(veiculo);
   const hasGps = hasVeiculoGps(veiculo);
 
   return (
     <Pressable
+      testID={testID}
       onPress={onPress}
       style={({ pressed }) => [styles.card, { opacity: pressed ? 0.85 : 1 }]}
     >

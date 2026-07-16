@@ -1,0 +1,34 @@
+appId: br.com.codecrafters.geopop
+---
+- runFlow: "00_setup.yaml"
+- openLink: "geopop://veiculos"
+- tapOn:
+    text: "Abrir"
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: "vehicles-screen"
+    timeout: 20000
+- assertVisible: "Veículos"
+- assertVisible:
+    id: "search-placa"
+- tapOn:
+    id: "search-placa"
+- inputText: ${GEOPOP_PLACA}
+- hideKeyboard
+- extendedWaitUntil:
+    visible: ${GEOPOP_PLACA}
+    timeout: 30000
+- tapOn:
+    id: "vehicle-card-.*"
+    index: 0
+- extendedWaitUntil:
+    visible:
+      id: "vehicle-detail-screen"
+    timeout: 20000
+- assertVisible: ${GEOPOP_PLACA}
+- assertVisible: "Identificação"
+- tapOn:
+    id: "vehicle-detail-back"
+- assertVisible:
+    id: "vehicles-screen"
