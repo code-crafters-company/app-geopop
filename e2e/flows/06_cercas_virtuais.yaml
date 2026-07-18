@@ -4,36 +4,112 @@ appId: br.com.codecrafters.geopop
 - tapOn:
     id: "tab-configuracao"
 - assertVisible: "Cercas Virtuais"
-- evalScript: ${output.cercaNome = 'CercaE2E' + Date.now()}
+
+# Abre o modal UMA vez (fechar e reabrir Modal RN no iOS trava a reapresentacao)
 - tapOn:
     id: "add-cerca-btn"
-- assertVisible: "Nova Cerca Virtual"
-- tapOn:
-    id: "geofence-name"
-- inputText: ${output.cercaNome}
-- hideKeyboard
-- tapOn:
-    id: "geofence-vehicle-.*"
-    index: 0
-- tapOn:
-    id: "geofence-map"
-- tapOn:
-    id: "geofence-radius"
-- eraseText: 8
-- inputText: "300"
-- hideKeyboard
-- tapOn:
-    id: "submit-cerca-btn"
 - extendedWaitUntil:
-    visible:
-      id: "geofence-card-${output.cercaNome}"
-    timeout: 20000
+    visible: "Nova Cerca Virtual"
+    timeout: 10000
 
-# Remove exatamente a cerca criada pelo teste.
+# ---------- UI do tipo Polígono (sem criar dados) ----------
+- assertVisible:
+    id: "geofence-tipo-circulo"
 - tapOn:
-    id: "delete-geofence-${output.cercaNome}"
-- tapOn: "Deletar"
-- extendedWaitUntil:
-    notVisible:
-      id: "geofence-card-${output.cercaNome}"
-    timeout: 15000
+    id: "geofence-tipo-poligono"
+- assertVisible: "Nenhum ponto marcado"
+- tapOn:
+    point: "40%,42%"
+- tapOn:
+    point: "60%,42%"
+- tapOn:
+    point: "50%,48%"
+- assertVisible: "Pontos: 3"
+- tapOn:
+    id: "geofence-remove-last"
+- assertVisible: "Pontos: 2 (mínimo 3)"
+- tapOn:
+    id: "geofence-clear-points"
+- assertVisible: "Nenhum ponto marcado"
+- tapOn:
+    id: "geofence-tipo-circulo"
+- assertVisible:
+    id: "geofence-radius"
+
+# ---------- CRUD completo (só quando há veículo vinculado ao usuário) ----------
+# Cada cerca pertence a um veículo. Com um UsuarioApp sem veículos o seletor
+# fica vazio e o bloco CRUD é ignorado (apenas a UI acima é validada).
+- runFlow:
+    when:
+      visible:
+        id: "geofence-vehicle-.*"
+    commands:
+      - evalScript: ${output.cercaNome = 'CercaE2E' + Date.now()}
+      - evalScript: ${output.cercaNomeEditado = output.cercaNome + '-ED'}
+
+      # CREATE: preenche e cria (o modal fecha no sucesso)
+      - tapOn:
+          id: "geofence-name"
+      - inputText: ${output.cercaNome}
+      - hideKeyboard
+      - tapOn:
+          id: "geofence-vehicle-.*"
+          index: 0
+      - tapOn:
+          id: "geofence-map"
+      - tapOn:
+          id: "geofence-radius"
+      - eraseText: 8
+      - inputText: "300"
+      - hideKeyboard
+      - tapOn:
+          id: "submit-cerca-btn"
+
+      # READ: cerca aparece na lista
+      - extendedWaitUntil:
+          visible:
+            id: "geofence-card-${output.cercaNome}"
+          timeout: 20000
+      - assertVisible: "Círculo · 300m"
+
+      # UPDATE: reabre (apos submit+refresh ha folga), renomeia e muda o raio
+      - tapOn:
+          id: "edit-geofence-${output.cercaNome}"
+      - extendedWaitUntil:
+          visible: "Editar Cerca Virtual"
+          timeout: 10000
+      - tapOn:
+          id: "geofence-name"
+      - eraseText: 40
+      - inputText: ${output.cercaNomeEditado}
+      - hideKeyboard
+      - tapOn:
+          id: "geofence-radius"
+      - eraseText: 8
+      - inputText: "450"
+      - hideKeyboard
+      - tapOn:
+          id: "submit-cerca-btn"
+      - extendedWaitUntil:
+          visible:
+            id: "geofence-card-${output.cercaNomeEditado}"
+          timeout: 20000
+      - assertVisible: "Círculo · 450m"
+
+      # DELETE: remove exatamente a cerca do teste
+      - tapOn:
+          id: "delete-geofence-${output.cercaNomeEditado}"
+      - tapOn: "Deletar"
+      - extendedWaitUntil:
+          notVisible:
+            id: "geofence-card-${output.cercaNomeEditado}"
+          timeout: 15000
+
+# Sem veículo: fecha o modal aberto para terminar limpo.
+- runFlow:
+    when:
+      visible: "Nova Cerca Virtual"
+    commands:
+      - tapOn:
+          id: "cancel-cerca-btn"
+- assertVisible: "Cercas Virtuais"

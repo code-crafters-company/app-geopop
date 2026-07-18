@@ -1,6 +1,7 @@
 # Fluxo avulso (NAO faz parte da suite numerada) para criar um UsuarioApp real
 # via a tela de Cadastro e obter credenciais utilizaveis nos demais fluxos e2e.
-# Uso: maestro test e2e/setup-test-user.yaml --env-file e2e/.env
+# Uso: node scripts/run-maestro.mjs e2e/setup-test-user.yaml
+# (o wrapper repassa e2e/.env via -e; o --env-file nao existe no maestro 2.6.x)
 appId: br.com.codecrafters.geopop
 ---
 - clearKeychain

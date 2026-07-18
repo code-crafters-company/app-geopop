@@ -112,6 +112,47 @@ Incluir no retorno do login (`RealizarLoginCommandOutput`) e/ou em `GET /usuario
 
 ---
 
+## 4. Endereço (local) nos eventos 🟡
+
+**Tela:** `app/(app)/relatorios/eventos.tsx` — doc seção 6 pede "lista dos eventos com nome,
+**local** e data". O `GET /api/v1/evento/paginado` retorna apenas `latitude`/`longitude`,
+sem endereço resolvido.
+
+**Paliativo atual no app:** exibe as coordenadas e abre o ponto no app de mapas ao tocar.
+
+### Contrato esperado
+
+Incluir no item do evento:
+```json
+{ "endereco": "Av. Paulista, 1000 - São Paulo/SP" }
+```
+(mesmo padrão do campo `endereco` já retornado em `/veiculo`).
+
+---
+
+## 5. Formato do campo `pontos` da cerca poligonal ⚠️ CONFIRMAR
+
+**Tela:** `app/(app)/configuracao/cercas.tsx` — criação de cerca tipo Polígono (doc seção 5.1).
+
+O Swagger define `CriarCercaVirtualInput.pontos` como `string` nullable, **sem documentar o
+formato**. O app envia (e lê) **JSON**:
+```json
+"[{\"latitude\":-23.62,\"longitude\":-46.55},{\"latitude\":-23.63,\"longitude\":-46.56},...]"
+```
+Na leitura o app também tolera o formato `"lat,lng;lat,lng;..."`. **Confirmar com o backend
+qual é o formato canônico** e ajustar `parsePontos`/`onSubmit` se necessário.
+
+---
+
+## 6. Cerca com múltiplos veículos 🟡
+
+O app de referência do doc (seção 5.1) tem "Gerenciar Veículos" por cerca (N veículos por
+cerca). O modelo atual da API é **1 cerca → 1 veículo** (`veiculoId` no
+`CriarCercaVirtualInput`). Para paridade, a API precisaria de tabela de vínculo
+cerca↔veículos e endpoints de associação. Sem isso, o app mantém a criação por veículo único.
+
+---
+
 ## Endpoints que JÁ existem e são usados corretamente ✅
 
 - **Alterar senha** — `PUT /api/v1/usuario-app/reset-senha` com `{ id, novaSenha }`.

@@ -10,7 +10,7 @@
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0A0A0A"
+      "backgroundColor": "#000000"
     },
     "ios": {
       "supportsTablet": true,
@@ -19,7 +19,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#0A0A0A"
+        "backgroundColor": "#000000"
       },
       "package": "br.com.codecrafters.geopop",
       "permissions": [
@@ -43,7 +43,7 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#0A0A0A",
+          "backgroundColor": "#000000",
           "image": "./assets/images/splash.png",
           "imageWidth": 200
         }

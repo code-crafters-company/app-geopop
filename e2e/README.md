@@ -106,7 +106,7 @@ npm run e2e:lista-veiculos
 Relatorio JUnit:
 
 ```powershell
-maestro test e2e/all.yaml --env-file e2e/.env --format junit --output e2e/report.xml
+node scripts/run-maestro.mjs e2e/all.yaml --format junit --output e2e/report.xml
 ```
 
 ## Validacao dos dados

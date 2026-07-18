@@ -50,3 +50,15 @@ appId: br.com.codecrafters.geopop
     id: "tab-mapa"
 - assertVisible:
     id: "map-screen"
+
+# Botao "Ver todos" abre a lista completa de veiculos (doc secao 4)
+- tapOn:
+    id: "open-vehicle-list"
+- extendedWaitUntil:
+    visible:
+      id: "vehicles-screen"
+    timeout: 15000
+- tapOn:
+    id: "tab-mapa"
+- assertVisible:
+    id: "map-screen"

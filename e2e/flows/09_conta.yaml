@@ -33,6 +33,11 @@ appId: br.com.codecrafters.geopop
 # Preferencias de notificacao (toggles)
 - assertVisible:
     id: "notif-pref-ignicaoLigada"
+# Bateria Desconectada (doc secao 8 — rastreador sem alimentacao)
+- scrollUntilVisible:
+    element:
+      id: "notif-pref-bateriaDesconectada"
+    direction: DOWN
 - scrollUntilVisible:
     element:
       id: "notif-pref-excessoVelocidade"

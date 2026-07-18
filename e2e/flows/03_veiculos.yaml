@@ -6,7 +6,9 @@ appId: br.com.codecrafters.geopop
 - tapOn:
     id: "vehicle-search"
 - inputText: ${GEOPOP_PLACA}
-- hideKeyboard
+# Dispensa o teclado tocando na area do mapa (hideKeyboard instavel no iOS)
+- tapOn:
+    point: "50%,32%"
 
 # A placa provisionada deve pertencer ao favorecido com o mesmo CPF/CNPJ do UsuarioApp.
 - extendedWaitUntil:

@@ -5,7 +5,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
-  ArrowSquareIn, ArrowSquareOut, BellRinging, Buildings, Clock,
+  ArrowSquareIn, ArrowSquareOut, BatteryWarning, BellRinging, Buildings, Clock,
   IdentificationBadge, Lightning, LightningSlash, Speedometer, SignOut,
   Terminal, User, UserSwitch, WifiHigh, WifiSlash,
 } from 'phosphor-react-native';
@@ -33,6 +33,7 @@ const NOTIFICACAO_TIPOS = [
   { key: 'ignicaoDesligada', label: 'Ignição Desligada', Icon: LightningSlash },
   { key: 'entradaCerca', label: 'Entrada de Cerca', Icon: ArrowSquareIn },
   { key: 'saidaCerca', label: 'Saída de Cerca', Icon: ArrowSquareOut },
+  { key: 'bateriaDesconectada', label: 'Bateria Desconectada', Icon: BatteryWarning },
   { key: 'resultadoComando', label: 'Resultado de Comando', Icon: Terminal },
   { key: 'trocaCondutor', label: 'Troca de Condutor', Icon: UserSwitch },
   { key: 'excessoVelocidade', label: 'Excesso de Velocidade', Icon: Speedometer },

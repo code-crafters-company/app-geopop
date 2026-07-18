@@ -8,20 +8,61 @@ appId: br.com.codecrafters.geopop
       id: "events-screen"
     timeout: 15000
 - assertVisible: "Eventos"
+
+# Filtro por tipo de evento (bottom-sheet)
 - assertVisible:
-    id: "event-filter-todos-eventos"
+    id: "filter-tipo"
 - tapOn:
-    id: "event-filter-igni-o-ligada"
-- swipe:
-    start: 80%, 28%
-    end: 25%, 28%
-    duration: 500
+    id: "filter-tipo"
+- assertVisible: "Filtrar por tipo de evento"
 - tapOn:
-    id: "event-filter-velocidade-excedida"
+    id: "tipo-option-0"
+- extendedWaitUntil:
+    notVisible: "Filtrar por tipo de evento"
+    timeout: 5000
+- assertVisible: "Ignição Ligada"
 - tapOn:
-    id: "event-filter-todos-eventos"
-- swipe:
-    direction: UP
+    id: "filter-tipo"
+- extendedWaitUntil:
+    visible: "Filtrar por tipo de evento"
+    timeout: 10000
+- tapOn:
+    id: "tipo-option-2"
+- extendedWaitUntil:
+    notVisible: "Filtrar por tipo de evento"
+    timeout: 5000
+- assertVisible: "Velocidade Excedida"
+- tapOn:
+    id: "filter-tipo"
+- extendedWaitUntil:
+    visible: "Filtrar por tipo de evento"
+    timeout: 10000
+- tapOn:
+    id: "tipo-option-all"
+- extendedWaitUntil:
+    notVisible: "Filtrar por tipo de evento"
+    timeout: 5000
+
+# Filtro por veículo (bottom-sheet)
+- tapOn:
+    id: "filter-veiculo"
+- extendedWaitUntil:
+    visible: "Filtrar por veículo"
+    timeout: 10000
+- tapOn:
+    id: "veiculo-option-all"
+
+# Período (controle segmentado)
+- tapOn:
+    id: "period-24h"
+- tapOn:
+    id: "period-7d"
+- tapOn:
+    id: "period-30d"
+- tapOn:
+    id: "period-tudo"
+
+# Alterna para Percursos e volta
 - tapOn: "Percursos"
 - assertVisible:
     id: "routes-screen"
