@@ -8,7 +8,7 @@ import MapView, { Marker, PROVIDER_GOOGLE, type MapType } from 'react-native-map
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, radius, spacing } from '../../src/components/theme';
 import { useVeiculos } from '../../src/hooks/useVeiculos';
-import { TENANT_KEY, TOKEN_KEY } from '../../src/services/api';
+import { getSessionTenant, TOKEN_KEY } from '../../src/services/api';
 import { useTrackingStore } from '../../src/stores/tracking';
 import { getVeiculoLocalizacao, hasVeiculoGps, isVeiculoOnline, type Veiculo } from '../../src/types';
 import { formatDateTime, formatSpeed } from '../../src/utils/format';
@@ -42,8 +42,13 @@ export default function MapaScreen() {
     let connection: HubConnection | undefined;
 
     (async () => {
-      const tenant = await SecureStore.getItemAsync(TENANT_KEY) ?? process.env.EXPO_PUBLIC_DEFAULT_TENANT ?? 'default';
+      // Sem tenant de sessão não há conexão legítima: nunca cair no tenant do build.
+      const tenant = await getSessionTenant();
       if (disposed) return;
+      if (!tenant) {
+        setConnected(false);
+        return;
+      }
       connection = new HubConnectionBuilder()
         .withUrl(`${API_BASE}/hubs/rastreamento`, {
           accessTokenFactory: async () => await SecureStore.getItemAsync(TOKEN_KEY) ?? '',

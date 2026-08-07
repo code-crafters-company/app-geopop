@@ -11,7 +11,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ArrowRight, CheckCircle } from 'phosphor-react-native';
 import { useAuthStore } from '../../src/stores/auth';
-import { api } from '../../src/services/api';
+import { publicApi } from '../../src/services/api';
 import { Button } from '../../src/components/Button';
 import { Input } from '../../src/components/Input';
 import { AuthBrand } from '../../src/components/AuthBrand';
@@ -30,7 +30,7 @@ export default function LoginScreen() {
   const { data: tenant } = useQuery({
     queryKey: ['tenant-branding', tenantSlug],
     queryFn: async () => {
-      const response = await api.get<{ result: { id: string; nome: string; logoUrl?: string | null; corPrimaria?: string | null } }>('/tenant/by-subdomain', { params: { subdominio: tenantSlug } });
+      const response = await publicApi.get<{ result: { id: string; nome: string; logoUrl?: string | null; corPrimaria?: string | null } }>('/tenant/by-subdomain', { params: { subdominio: tenantSlug } });
       return response.data.result;
     },
     retry: 1,
@@ -44,15 +44,14 @@ export default function LoginScreen() {
   const mutation = useMutation({
     mutationFn: async (data: FormData) => {
       // A API retorna os campos do login na raiz do JSON (não dentro de "result")
-      const res = await api.post<LoginResult & { isValid: boolean; errors: string[] }>(
+      const res = await publicApi.post<LoginResult & { isValid: boolean; errors: string[] }>(
         '/auth/login',
         { email: data.email, senha: data.senha }
       );
       if (!res.data.isValid) throw new Error(res.data.errors?.[0] ?? 'Credenciais inválidas');
-      return res.data;
-    },
-    onSuccess: async (data) => {
-      await signIn(data);
+      // `signIn` recusa a sessão (e não grava nada) quando a resposta vem sem
+      // `subdominio`: o erro cai no onError e o usuário permanece no login.
+      await signIn(res.data);
     },
     onError: (err: Error) => {
       Alert.alert('Erro', err.message || 'Não foi possível fazer login.');

@@ -11,7 +11,7 @@ import { z } from 'zod';
 import { AuthBrand } from '../../src/components/AuthBrand';
 import { Button } from '../../src/components/Button';
 import { Input } from '../../src/components/Input';
-import { api } from '../../src/services/api';
+import { publicApi } from '../../src/services/api';
 
 const onlyDigits = (value: string) => value.replace(/\D/g, '');
 
@@ -36,7 +36,7 @@ export default function CadastroScreen() {
   const { data: tenant, isLoading: isLoadingTenant } = useQuery({
     queryKey: ['tenant-branding', tenantSlug],
     queryFn: async () => {
-      const response = await api.get<{ result: Tenant }>('/tenant/by-subdomain', {
+      const response = await publicApi.get<{ result: Tenant }>('/tenant/by-subdomain', {
         params: { subdominio: tenantSlug },
       });
       return response.data.result;
@@ -53,7 +53,7 @@ export default function CadastroScreen() {
     mutationFn: async (data: FormData) => {
       if (!tenant?.id) throw new Error('Não foi possível identificar a organização. Tente novamente.');
 
-      const response = await api.post<{ isValid?: boolean; errors?: string[] }>('/usuario-app/registrar', {
+      const response = await publicApi.post<{ isValid?: boolean; errors?: string[] }>('/usuario-app/registrar', {
         nomeCompleto: data.nomeCompleto.trim(),
         cpfCnpj: onlyDigits(data.cpfCnpj),
         email: data.email.trim().toLowerCase(),
