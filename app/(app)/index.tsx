@@ -1,13 +1,14 @@
 import { HubConnectionBuilder, LogLevel, type HubConnection } from '@microsoft/signalr';
 import * as SecureStore from 'expo-secure-store';
 import { useRouter } from 'expo-router';
-import { BatteryMedium, Bell, CaretDown, CaretUp, Lightning, MagnifyingGlass, MapPin, MapTrifold, WifiHigh, WifiSlash } from 'phosphor-react-native';
+import { BatteryMedium, Bell, CaretDown, CaretUp, Lightning, LightningSlash, MagnifyingGlass, MapPin, MapTrifold, WifiHigh, WifiSlash, X } from 'phosphor-react-native';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { FlatList, Image, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE, type MapType } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, radius, spacing } from '../../src/components/theme';
 import { useVeiculos } from '../../src/hooks/useVeiculos';
+import { useEndereco } from '../../src/hooks/useEndereco';
 import { TENANT_KEY, TOKEN_KEY } from '../../src/services/api';
 import { useTrackingStore } from '../../src/stores/tracking';
 import { getVeiculoLocalizacao, hasVeiculoGps, isVeiculoOnline, type Veiculo } from '../../src/types';
@@ -174,7 +175,14 @@ export default function MapaScreen() {
         )}
       </View>
 
-      {selected && !showList && <SelectedVehicle vehicle={selected} onOpen={() => router.push(`/(app)/veiculos/${selected.id}`)} bottom={insets.bottom + 76} />}
+      {selected && !showList && (
+        <SelectedVehicle
+          vehicle={selected}
+          onOpen={() => router.push(`/(app)/veiculos/${selected.id}`)}
+          onClose={() => setSelectedId(null)}
+          bottom={insets.bottom + 76}
+        />
+      )}
 
       <View testID="vehicle-panel" style={[styles.listPanel, { paddingBottom: showList ? insets.bottom : 0 }]}>
         <Pressable
@@ -250,13 +258,53 @@ function VehicleRow({ vehicle, selected, onPress }: { vehicle: Veiculo; selected
   </Pressable>;
 }
 
-function SelectedVehicle({ vehicle, onOpen, bottom }: { vehicle: Veiculo; onOpen: () => void; bottom: number }) {
-  return <Pressable testID="selected-vehicle-card" style={[styles.infoCard, { bottom }]} onPress={onOpen}>
-    <View style={styles.vehicleHeader}><Text style={styles.infoPlate}>{vehicle.placa}</Text><Text style={styles.infoSpeed}>{formatSpeed(vehicle.ultimaVelocidade)}</Text></View>
-    <Text style={styles.infoModel}>{[vehicle.marca, vehicle.modelo].filter(Boolean).join(' ')}</Text>
-    <View style={styles.vehicleLocation}><MapPin size={14} color={colors.success} /><Text style={styles.infoLocation} numberOfLines={1}>{getVeiculoLocalizacao(vehicle)}</Text></View>
-    <Text style={styles.infoTime}>{vehicle.ultimaPosicao ? `Última posição: ${formatDateTime(vehicle.ultimaPosicao)}` : 'Sem posição registrada'}</Text>
-  </Pressable>;
+function SelectedVehicle({ vehicle, onOpen, onClose, bottom }: { vehicle: Veiculo; onOpen: () => void; onClose: () => void; bottom: number }) {
+  const online = isVeiculoOnline(vehicle);
+  const hasGps = hasVeiculoGps(vehicle);
+  // Doc App item 1: endereço completo no lugar de cidade/UF.
+  const { data: endereco } = useEndereco(vehicle.latitude, vehicle.longitude);
+  const localizacao = endereco ?? getVeiculoLocalizacao(vehicle);
+
+  return (
+    <Pressable testID="selected-vehicle-card" style={[styles.infoCard, { bottom }]} onPress={onOpen}>
+      <View style={styles.vehicleHeader}>
+        <Text style={styles.infoPlate} numberOfLines={1}>{vehicle.placa}</Text>
+        <View style={styles.infoHeaderRight}>
+          <Text style={styles.infoSpeed}>{formatSpeed(vehicle.ultimaVelocidade)}</Text>
+          {/* Doc App item 1: botão X para fechar o card. */}
+          <Pressable testID="close-selected-vehicle" onPress={onClose} hitSlop={10} style={styles.infoClose} accessibilityLabel="Fechar">
+            <X size={16} color={colors.textMuted} weight="bold" />
+          </Pressable>
+        </View>
+      </View>
+      <Text style={styles.infoModel}>{[vehicle.marca, vehicle.modelo].filter(Boolean).join(' ')}</Text>
+
+      {/* Doc App item 1: ícones de status — comunicação, ignição, GPS, bateria. */}
+      <View style={styles.infoStatusRow}>
+        <View style={styles.infoStatusItem}>
+          {online ? <WifiHigh size={15} color={colors.success} /> : <WifiSlash size={15} color={colors.textMuted} />}
+          <Text style={styles.infoStatusText}>{online ? 'Online' : 'Offline'}</Text>
+        </View>
+        <View style={styles.infoStatusItem}>
+          {vehicle.ignicao ? <Lightning size={15} color={colors.success} weight="fill" /> : <LightningSlash size={15} color={colors.error} />}
+          <Text style={styles.infoStatusText}>{vehicle.ignicao ? 'Ligado' : 'Desligado'}</Text>
+        </View>
+        <View style={styles.infoStatusItem}>
+          <MapPin size={15} color={hasGps ? colors.success : colors.textMuted} weight="fill" />
+          <Text style={styles.infoStatusText}>{hasGps ? 'GPS' : 'Sem GPS'}</Text>
+        </View>
+        {typeof vehicle.bateriaPercentual === 'number' && (
+          <View style={styles.infoStatusItem}>
+            <BatteryMedium size={15} color={colors.success} />
+            <Text style={styles.infoStatusText}>{vehicle.bateriaPercentual}%</Text>
+          </View>
+        )}
+      </View>
+
+      <View style={styles.vehicleLocation}><MapPin size={14} color={colors.success} /><Text style={styles.infoLocation} numberOfLines={2}>{localizacao}</Text></View>
+      <Text style={styles.infoTime}>{vehicle.ultimaPosicao ? `Última posição: ${formatDateTime(vehicle.ultimaPosicao)}` : 'Sem posição registrada'}</Text>
+    </Pressable>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -323,9 +371,14 @@ const styles = StyleSheet.create({
   vehicleFooter: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 },
   vehicleTime: { color: colors.textMuted, fontSize: 9, marginLeft: 'auto' },
   infoCard: { position: 'absolute', left: spacing.lg, right: spacing.lg, backgroundColor: '#FFFFFFF5', borderRadius: radius.lg, padding: spacing.lg, borderWidth: 1, borderColor: colors.cardBorder, shadowColor: '#000', shadowOpacity: 0.12, shadowRadius: 8, elevation: 4 },
-  infoPlate: { color: colors.text, fontSize: 18, fontWeight: '900', letterSpacing: 1 },
+  infoPlate: { color: colors.text, fontSize: 18, fontWeight: '900', letterSpacing: 1, flex: 1, marginRight: 8 },
+  infoHeaderRight: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   infoSpeed: { color: colors.primary, fontSize: 20, fontWeight: '900' },
+  infoClose: { width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background, borderWidth: 1, borderColor: colors.cardBorder },
   infoModel: { color: colors.textSecondary, fontSize: 12, marginTop: 2 },
+  infoStatusRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 14, marginTop: 8 },
+  infoStatusItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  infoStatusText: { color: colors.textSecondary, fontSize: 11, fontWeight: '600' },
   infoLocation: { color: colors.textSecondary, fontSize: 12, flex: 1 },
   infoTime: { color: colors.textMuted, fontSize: 10, marginTop: 5 },
 });
