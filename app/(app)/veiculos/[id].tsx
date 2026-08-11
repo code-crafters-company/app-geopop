@@ -9,11 +9,12 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ArrowLeft, Car, Lightning, LightningSlash, MapPin, WifiHigh, WifiSlash } from 'phosphor-react-native';
 import { Pressable } from 'react-native';
 import { useVeiculo } from '../../../src/hooks/useVeiculos';
+import { useEndereco } from '../../../src/hooks/useEndereco';
+import { useTrackingStore } from '../../../src/stores/tracking';
 import { Card } from '../../../src/components/Card';
-import { Badge } from '../../../src/components/Badge';
 import { colors, spacing, radius } from '../../../src/components/theme';
 import { formatSpeed, formatDateTime, formatCoord } from '../../../src/utils/format';
-import { getVeiculoLocalizacao, hasVeiculoGps, isVeiculoOnline } from '../../../src/types';
+import { getVeiculoLocalizacao, hasVeiculoGps, isVeiculoOnline, type Veiculo } from '../../../src/types';
 
 function InfoRow({ label, value }: { label: string; value?: string | null }) {
   if (!value) return null;
@@ -29,9 +30,19 @@ export default function VeiculoDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { data: veiculo, isLoading } = useVeiculo(id);
+  const { data: buscado, isLoading } = useVeiculo(id);
+  // Doc App item 2: a ignição (e demais dados dinâmicos) aparecia desatualizada —
+  // o detalhe era uma busca única, sem tempo real. Mescla o estado AO VIVO do
+  // store (atualizado por SignalR na Home) por cima do registro buscado.
+  const live = useTrackingStore((s) => (id ? s.vehicles[id] : undefined));
+  const veiculo: Veiculo | undefined = React.useMemo(
+    () => (buscado || live ? ({ ...(buscado ?? {} as Veiculo), ...(live ?? {}) } as Veiculo) : undefined),
+    [buscado, live],
+  );
+  // Hook no topo (antes de qualquer return) — desabilita sozinho sem coordenada.
+  const { data: enderecoResolvido } = useEndereco(veiculo?.latitude, veiculo?.longitude);
 
-  if (isLoading) {
+  if (isLoading && !veiculo) {
     return (
       <View style={[styles.container, { paddingTop: insets.top, justifyContent: 'center', alignItems: 'center' }]}>
         <ActivityIndicator color={colors.primary} size="large" />
@@ -46,6 +57,8 @@ export default function VeiculoDetailScreen() {
 
   const hasPos = hasVeiculoGps(veiculo);
   const online = isVeiculoOnline(veiculo);
+  // Doc App item 2: endereço completo (nos dois locais que mostram o endereço).
+  const endereco = enderecoResolvido ?? getVeiculoLocalizacao(veiculo);
 
   return (
     <View testID="vehicle-detail-screen" style={[styles.container, { paddingTop: insets.top }]}>
@@ -111,7 +124,7 @@ export default function VeiculoDetailScreen() {
 
         <Card style={styles.gpsCard}>
           {online ? <WifiHigh size={20} color={colors.success} /> : <WifiSlash size={20} color={colors.textMuted} />}
-          <View style={{ flex: 1 }}><Text style={styles.infoValue}>{online ? 'GPS online' : 'GPS offline'}</Text><Text style={styles.infoLabel}>{getVeiculoLocalizacao(veiculo)}</Text></View>
+          <View style={{ flex: 1 }}><Text style={styles.infoValue}>{online ? 'GPS online' : 'GPS offline'}</Text><Text style={styles.infoLabel} numberOfLines={2}>{endereco}</Text></View>
           <MapPin size={20} color={hasPos ? colors.success : colors.textMuted} weight="fill" />
         </Card>
 
@@ -122,7 +135,7 @@ export default function VeiculoDetailScreen() {
           <InfoRow label="Marca / Modelo" value={[veiculo.marca, veiculo.modelo].filter(Boolean).join(' ')} />
           <InfoRow label="Cor" value={veiculo.cor} />
           <InfoRow label="Proprietário" value={veiculo.favorecidoNome} />
-          <InfoRow label="Localização" value={getVeiculoLocalizacao(veiculo)} />
+          <InfoRow label="Endereço" value={endereco} />
           <InfoRow label="Última posição" value={veiculo.ultimaPosicao ? formatDateTime(veiculo.ultimaPosicao) : null} />
           <InfoRow label="Coordenadas" value={formatCoord(veiculo.latitude, veiculo.longitude)} />
           {veiculo.limiteVelocidadeKmh && (
