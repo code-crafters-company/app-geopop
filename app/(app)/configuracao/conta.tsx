@@ -5,14 +5,14 @@ import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
-  ArrowSquareIn, ArrowSquareOut, BatteryWarning, BellRinging, Buildings, Clock,
-  IdentificationBadge, Lightning, LightningSlash, Speedometer, SignOut,
-  Terminal, User, UserSwitch, WifiHigh, WifiSlash,
+  ArrowSquareIn, ArrowSquareOut, BatteryWarning, Clock,
+  Lightning, LightningSlash, Speedometer, SignOut,
+  Terminal, Trash, User,
 } from 'phosphor-react-native';
 import { useAuthStore } from '../../../src/stores/auth';
 import { useTrackingStore } from '../../../src/stores/tracking';
 import { useQueryClient } from '@tanstack/react-query';
-import { useAlterarSenha } from '../../../src/hooks/useUsuarioApp';
+import { useAlterarSenha, useExcluirMinhaConta } from '../../../src/hooks/useUsuarioApp';
 import { Card } from '../../../src/components/Card';
 import { Button } from '../../../src/components/Button';
 import { Input } from '../../../src/components/Input';
@@ -28,6 +28,7 @@ const senhaSchema = z.object({
 });
 type SenhaForm = z.infer<typeof senhaSchema>;
 
+// Doc App item 4: "Troca de Condutor" e "Alarme" removidos.
 const NOTIFICACAO_TIPOS = [
   { key: 'ignicaoLigada', label: 'Ignição Ligada', Icon: Lightning },
   { key: 'ignicaoDesligada', label: 'Ignição Desligada', Icon: LightningSlash },
@@ -35,18 +36,16 @@ const NOTIFICACAO_TIPOS = [
   { key: 'saidaCerca', label: 'Saída de Cerca', Icon: ArrowSquareOut },
   { key: 'bateriaDesconectada', label: 'Bateria Desconectada', Icon: BatteryWarning },
   { key: 'resultadoComando', label: 'Resultado de Comando', Icon: Terminal },
-  { key: 'trocaCondutor', label: 'Troca de Condutor', Icon: UserSwitch },
   { key: 'excessoVelocidade', label: 'Excesso de Velocidade', Icon: Speedometer },
-  { key: 'alarme', label: 'Alarme', Icon: BellRinging },
 ] as const;
 
 export default function ContaScreen() {
   const { user, signOut } = useAuthStore();
   const clearVehicles = useTrackingStore((state) => state.clear);
-  const connected = useTrackingStore((state) => state.connected);
   const queryClient = useQueryClient();
   const insets = useSafeAreaInsets();
   const alterarSenha = useAlterarSenha();
+  const excluirConta = useExcluirMinhaConta();
 
   const [notificacoesPref, setNotificacoesPref] = useState<Record<string, boolean>>(
     () => Object.fromEntries(NOTIFICACAO_TIPOS.map((tipo) => [tipo.key, true])),
@@ -62,6 +61,25 @@ export default function ContaScreen() {
       { text: 'Cancelar', style: 'cancel' },
       { text: 'Sair', style: 'destructive', onPress: async () => { queryClient.clear(); clearVehicles(); await signOut(); } },
     ]);
+  };
+
+  // Doc App item 4: excluir a conta. Inativa no backend e desloga.
+  const handleExcluirConta = () => {
+    Alert.alert(
+      'Excluir conta',
+      'Tem certeza que deseja excluir sua conta? Você perderá o acesso ao aplicativo.',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Excluir',
+          style: 'destructive',
+          onPress: () => excluirConta.mutate(undefined, {
+            onSuccess: async () => { queryClient.clear(); clearVehicles(); await signOut(); },
+            onError: () => Alert.alert('Erro', 'Não foi possível excluir a conta. Tente novamente.'),
+          }),
+        },
+      ],
+    );
   };
 
   const onAlterarSenha = (data: SenhaForm) => {
@@ -110,20 +128,7 @@ export default function ContaScreen() {
             <Text style={styles.infoValue}>{user.nomeCompleto}</Text>
           </View>
         </View>
-        <View style={styles.infoRow}>
-          <IdentificationBadge size={18} color={colors.primary} />
-          <View style={styles.infoText}>
-            <Text style={styles.infoLabel}>Função</Text>
-            <Text style={styles.infoValue}>{user.isAppUser ? 'Usuário' : 'Administrador'}</Text>
-          </View>
-        </View>
-        <View style={styles.infoRow}>
-          <Buildings size={18} color={colors.primary} />
-          <View style={styles.infoText}>
-            <Text style={styles.infoLabel}>Tenant</Text>
-            <Text style={styles.infoValue}>{user.subdominio ?? '—'}</Text>
-          </View>
-        </View>
+        {/* Doc App item 4: campos "Função" e "Tenant" removidos. */}
         <View style={[styles.infoRow, { borderBottomWidth: 0 }]}>
           <Clock size={18} color={colors.primary} />
           <View style={styles.infoText}>
@@ -133,15 +138,7 @@ export default function ContaScreen() {
         </View>
       </Card>
 
-      {/* Conexão em Tempo Real */}
-      <Text style={styles.sectionTitle}>Conexão em Tempo Real</Text>
-      <Card style={[styles.card, styles.connectionCard]} testID="realtime-connection-card">
-        {connected ? <WifiHigh size={20} color={colors.success} /> : <WifiSlash size={20} color={colors.textMuted} />}
-        <View style={styles.infoText}>
-          <Text style={styles.infoValue}>{connected ? 'Conectado' : 'Desconectado'}</Text>
-          <Text style={styles.infoLabel}>Status da conexão para atualizações em tempo real</Text>
-        </View>
-      </Card>
+      {/* Doc App item 4: seção "Conexão em Tempo Real" removida. */}
 
       {/* Alterar Senha */}
       <Text style={styles.sectionTitle}>Alterar Senha</Text>
@@ -211,6 +208,12 @@ export default function ContaScreen() {
         <Text style={styles.signOutText}>Sair da Conta</Text>
       </Pressable>
 
+      {/* Doc App item 4: excluir conta */}
+      <Pressable style={styles.deleteBtn} onPress={handleExcluirConta} testID="delete-account-btn" disabled={excluirConta.isPending}>
+        <Trash size={18} color="#fff" />
+        <Text style={styles.deleteText}>{excluirConta.isPending ? 'Excluindo…' : 'Excluir Conta'}</Text>
+      </Pressable>
+
       <Text style={styles.version}>GeoPop Mobile v1.0.0</Text>
     </ScrollView>
   );
@@ -260,5 +263,12 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xxl,
   },
   signOutText: { color: colors.error, fontSize: 16, fontWeight: '700' },
+  deleteBtn: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    gap: spacing.sm, backgroundColor: colors.error,
+    borderRadius: radius.lg, padding: spacing.md,
+    marginTop: -spacing.lg, marginBottom: spacing.xxl,
+  },
+  deleteText: { color: '#fff', fontSize: 15, fontWeight: '700' },
   version: { color: colors.textMuted, fontSize: 12, textAlign: 'center' },
 });
