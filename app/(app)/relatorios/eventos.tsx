@@ -9,6 +9,7 @@ import {
   Lightning, LightningSlash, MapPin, Speedometer, X,
 } from 'phosphor-react-native';
 import { useEventos } from '../../../src/hooks/useEventos';
+import { useEndereco } from '../../../src/hooks/useEndereco';
 import { EmptyState } from '../../../src/components/EmptyState';
 import { colors, spacing, radius } from '../../../src/components/theme';
 import { formatDateTime } from '../../../src/utils/format';
@@ -43,6 +44,10 @@ function EventoItem({ item }: { item: Evento }) {
   const cfg = TIPO_CONFIG[item.tipo] ?? { label: 'Evento', color: colors.primary, Icon: MapPin };
   const { Icon } = cfg;
   const hasLocal = item.latitude != null && item.longitude != null;
+  // Doc App item 6: endereço no lugar da LAT/LONG.
+  const { data: endereco } = useEndereco(item.latitude, item.longitude);
+  const local = endereco ?? (hasLocal ? `${item.latitude!.toFixed(5)}, ${item.longitude!.toFixed(5)}` : null);
+
   return (
     <View style={styles.item}>
       <View style={[styles.iconWrap, { backgroundColor: cfg.color + '18' }]}>
@@ -59,12 +64,18 @@ function EventoItem({ item }: { item: Evento }) {
             accessibilityLabel="Abrir local do evento no mapa"
           >
             <MapPin size={12} color={colors.info} weight="fill" />
-            <Text style={styles.itemLocal} numberOfLines={1}>
-              {item.latitude!.toFixed(5)}, {item.longitude!.toFixed(5)}
-            </Text>
+            <Text style={styles.itemLocal} numberOfLines={2}>{local}</Text>
           </Pressable>
         )}
-        <Text style={styles.itemTime}>{formatDateTime(item.dataHora)}</Text>
+        <View style={styles.itemMetaRow}>
+          <Text style={styles.itemTime}>{formatDateTime(item.dataHora)}</Text>
+          {typeof item.velocidade === 'number' && (
+            <View style={styles.itemSpeed}>
+              <Speedometer size={12} color={colors.textSecondary} />
+              <Text style={styles.itemSpeedText}>{Math.round(item.velocidade)} km/h</Text>
+            </View>
+          )}
+        </View>
       </View>
       <View style={[styles.dot, { backgroundColor: cfg.color }]} />
     </View>
@@ -303,8 +314,11 @@ const styles = StyleSheet.create({
   itemInfo: { flex: 1 },
   itemPlaca: { color: colors.text, fontSize: 14, fontWeight: '700', letterSpacing: 0.5 },
   itemDesc: { color: colors.textSecondary, fontSize: 12, marginVertical: 2 },
-  itemLocalRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 2 },
+  itemLocalRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 4, marginBottom: 2 },
   itemLocal: { color: colors.info, fontSize: 11, flexShrink: 1 },
+  itemMetaRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 2 },
   itemTime: { color: colors.textMuted, fontSize: 11 },
+  itemSpeed: { flexDirection: 'row', alignItems: 'center', gap: 3 },
+  itemSpeedText: { color: colors.textSecondary, fontSize: 11, fontWeight: '700' },
   dot: { width: 8, height: 8, borderRadius: 4 },
 });
