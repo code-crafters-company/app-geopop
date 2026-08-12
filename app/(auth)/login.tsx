@@ -121,6 +121,11 @@ export default function LoginScreen() {
                 )}
               />
 
+              {/* Doc App item 5: Esqueci minha senha */}
+              <Pressable testID="esqueci-senha-link" style={styles.forgot} onPress={() => router.push('/esqueci-senha')}>
+                <Text style={styles.forgotText}>Esqueci minha senha</Text>
+              </Pressable>
+
               <Button
                 label="Entrar na plataforma"
                 onPress={handleSubmit((d) => mutation.mutate(d))}
@@ -185,6 +190,8 @@ const styles = StyleSheet.create({
   formHeading: { marginBottom: 20 },
   formTitle: { color: '#18202D', fontSize: 19, fontWeight: '800' },
   formHint: { color: '#7A8494', fontSize: 12, marginTop: 5 },
+  forgot: { alignSelf: 'flex-end', marginTop: 4, marginBottom: 4, paddingVertical: 2 },
+  forgotText: { color: '#9B7410', fontSize: 12, fontWeight: '700' },
   submitButton: { marginTop: spacing.sm, backgroundColor: '#E8B923', borderRadius: 14, height: 54 },
   secureRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 14 },
   secureText: { color: '#7A8494', fontSize: 11, fontWeight: '500' },
